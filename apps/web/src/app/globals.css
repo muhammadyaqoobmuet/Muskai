@@ -1,0 +1,314 @@
+@import 'tailwindcss';
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/*
+  ---break---
+*/
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Muskai design tokens, Apple product-page language.
+
+  Light only. The canvas is paper (#fff) with gray bands (#f5f5f7) for
+  rhythm, black type (#1d1d1f), and exactly one chromatic accent: Action
+  Blue (#0071e3), reserved for filled buttons. Inline links use Link Blue
+  (#0066cc). Nothing else in the UI carries colour; the reels do.
+
+  Rules that keep this from drifting:
+  - Surfaces alternate white / canvas gray. No dividers, no shadows.
+  - Cards are 28px, controls 12px, buttons full pills.
+  - Type is Inter at Apple's scale: 17px body, 40-96px display, tight
+    tracking on the big sizes, open tracking on body.
+  - Media is the only colour. UI chrome stays monochrome.
+  - Words below ink-400 are surfaces and rules, never copy.
+  - Nothing animates without a reason: hierarchy, feedback or state.
+*/
+
+@theme {
+  /* Ink ramp, light: ink-50 is the text, ink-950 is the near-white band. */
+  --color-ink-950: #f5f5f7;
+  --color-ink-900: #f5f5f7;
+  --color-ink-850: #fafafc;
+  --color-ink-800: #e8e8ed;
+  --color-ink-700: #d6d6d6;
+  --color-ink-600: #a1a1a6;
+  --color-ink-500: #86868b;
+  --color-ink-400: #6e6e73;
+  --color-ink-300: #474747;
+  --color-ink-200: #2e2e30;
+  --color-ink-100: #1d1d1f;
+  --color-ink-50: #1d1d1f;
+
+  /* The one accent. Filled buttons only; links use spark-text. */
+  --color-spark: #0071e3;
+  --color-spark-soft: #0077ed;
+  --color-spark-ink: #ffffff;
+  --color-spark-text: #0066cc;
+
+  /* Status. Alert red for failures, ember for live punctuation. */
+  --color-danger: #d70015;
+  --color-danger-soft: #fff2f2;
+  --color-ember: #b64400;
+
+  /* Product finish swatches, used only inside imagery. */
+  --color-finish-sky: #c8d8e0;
+  --color-finish-citrus: #dddc8c;
+  --color-finish-starlight: #f0e4d3;
+  --color-finish-silver: #e3e4e5;
+  --color-finish-blush: #e8d0d0;
+  --color-finish-indigo: #596680;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'SF Mono', monospace;
+
+  --radius-control: 12px;
+  --radius-card: 28px;
+  --radius-pill: 999px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-rise: rise 0.6s var(--ease-out-expo) both;
+  --animate-sweep: sweep 2.4s var(--ease-out-expo) infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -140% 0;
+  }
+  100% {
+    background-position: 240% 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(200%, 0, 0);
+  }
+}
+
+/* A spent value dissolves where it sits: it blurs, lifts a touch and goes. */
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  55% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translate3d(0, -12px, 0) scale(0.97);
+  }
+}
+
+[data-dissolving='true'] {
+  animation: dissolve 480ms var(--ease-out-expo) forwards;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    @apply font-sans;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: var(--color-ink-100);
+    font-family: var(--font-sans);
+    letter-spacing: -0.022em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-spark) 18%, #ffffff);
+    color: var(--color-ink-100);
+  }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--color-spark) 45%, transparent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c7c7cc transparent;
+    @apply border-border outline-ring/50;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #c7c7cc;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a6;
+    background-clip: content-box;
+  }
+
+  /* Media letterboxes on black, like every player people already trust. */
+  video {
+    background-color: #000000;
+  }
+
+  /* Display type: tight tracking keeps the big sizes architectural. */
+  h1,
+  h2 {
+    letter-spacing: -0.035em;
+  }
+}
+
+@layer components {
+  .hairline {
+    border-color: var(--color-ink-700);
+  }
+
+  /* Skeleton: a moving highlight, not a grey block. */
+  .skeleton {
+    background-image: linear-gradient(
+      100deg,
+      #f0f0f2 20%,
+      #e6e6ea 40%,
+      #f0f0f2 60%
+    );
+    background-size: 220% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Horizontal reel rail used by the marketing strips. */
+  .rail {
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/*
+  ---break---
+*/
+@theme inline {
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+/*
+  ---break---
+*/
+/*
+  shadcn token bridge.
+
+  shadcn registry components speak in --background, --primary, --ring. They
+  point at the same Apple palette rather than introducing a second one.
+*/
+:root {
+  --background: #ffffff;
+  --foreground: var(--color-ink-100);
+  --card: #ffffff;
+  --card-foreground: var(--color-ink-100);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-ink-100);
+  --primary: var(--color-spark);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-ink-800);
+  --secondary-foreground: var(--color-ink-100);
+  --muted: var(--color-ink-950);
+  --muted-foreground: var(--color-ink-400);
+  --accent: var(--color-ink-800);
+  --accent-foreground: var(--color-ink-100);
+  --destructive: var(--color-danger);
+  --border: var(--color-ink-700);
+  --input: var(--color-ink-700);
+  --ring: var(--color-spark);
+  --chart-1: var(--color-spark);
+  --chart-2: var(--color-ink-400);
+  --chart-3: var(--color-ink-300);
+  --chart-4: var(--color-ink-500);
+  --chart-5: var(--color-ink-600);
+  --radius: 0.75rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--color-ink-100);
+  --sidebar-primary: var(--color-spark);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-ink-950);
+  --sidebar-accent-foreground: var(--color-ink-100);
+  --sidebar-border: var(--color-ink-700);
+  --sidebar-ring: var(--color-spark);
+}

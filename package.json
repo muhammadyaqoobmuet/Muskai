@@ -1,0 +1,22 @@
+{
+  "description": "Muskai — text-to-reels studio. Next.js frontend + Express API + Alibaba DashScope free-quota video models.",
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "name": "muskai",
+  "private": true,
+  "scripts": {
+    "build": "npm run build -w @muskai/shared && npm run build -w @muskai/api && npm run build -w @muskai/web",
+    "dev": "npm run build -w @muskai/shared && concurrently -k -n api,web -c green,cyan \"npm run dev -w @muskai/api\" \"npm run dev -w @muskai/web\"",
+    "setup": "npm run build -w @muskai/shared && npm run db:setup -w @muskai/api"
+  },
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "packages/shared"
+  ]
+}

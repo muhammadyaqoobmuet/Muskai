@@ -1,0 +1,24 @@
+# Local development database for Muskai.
+# Usage: docker compose up -d   (then the API can reach it on localhost:5432)
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: muskai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: muskai
+      POSTGRES_USER: muskai
+      # Dev-only default; override with POSTGRES_PASSWORD in your shell/.env for anything real.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-muskai_dev}
+    ports:
+      - "5433:5432"
+    volumes:
+      - muskai-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U muskai -d muskai"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  muskai-postgres-data:
